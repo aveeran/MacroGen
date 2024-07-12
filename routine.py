@@ -2,11 +2,8 @@ from pynput import keyboard, mouse
 from pynput.keyboard import Listener, Key
 
 record_key = Key.ctrl_l
-
 recording = False
-
 recorded_events = []
-
 
 def on_press(key):
     global recording
