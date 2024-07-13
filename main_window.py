@@ -7,9 +7,7 @@ import json
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
-        self.conn = DatabaseConnection.get_connection()
-        self.temp_data()
+        self.db_conn = DatabaseConnection.get_instance()
         
         self.setWindowTitle("MacroGen")
         self.parentLayout = QVBoxLayout()
@@ -26,15 +24,26 @@ class MainWindow(QMainWindow):
         container.setLayout(self.parentLayout)
         self.setCentralWidget(container)
 
-    def temp_data(self):
-        query = "INSERT INTO macros (name, date, date_modified, macro) VALUES (?, ?, ?, ?)"
-        params = ('Example Macro', '20204-07-12', '2024-07-12', 'print("Hello, World!")')
-        self.conn.execute_query(query, params)
-
-        
+    def closeEvent(self, event):
+        DatabaseConnection.close_connection()
 
     def init_macro_table(self):
-        pass
+        query = "SELECT * FROM macros"
+        cursor = self.db_conn.execute_query(query)
+        rows = cursor.fetchall()
+        
+        self.tableWidget = QTableWidget()
+        self.tableWidget.setRowCount(len(rows))
+        self.tableWidget.setColumnCount(5)
+
+        horizontal_header_labels = ["ID", "NAME", "DATE CREATED", "DATE MODIFIED", "CONTENT"]
+        self.tableWidget.setHorizontalHeaderLabels(horizontal_header_labels)
+
+        for row, row_data in enumerate(rows):
+            for col, col_data in enumerate(row_data):
+                item = QTableWidgetItem(col_data)
+                self.tableWidget.setItem(row, col, item)
+        self.parentLayout.addWidget(self.tableWidget)
 
     def init_action_buttons(self):
         add_macro_btn = QPushButton("Add Macro")

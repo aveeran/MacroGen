@@ -26,12 +26,11 @@ class DatabaseConnection:
 
         return cls._instance 
      
-    
     @classmethod
-    def get_connection(cls):
+    def get_instance(cls):
         if cls._instance is None:
             cls._instance = cls()
-        return cls._instance.conn
+        return cls._instance
     
     @classmethod
     def close_connection(cls):
@@ -39,7 +38,6 @@ class DatabaseConnection:
             cls._instance.conn.close()
             cls._instance = None
             
-
     def execute_query(self, query, params=None):
         cursor = self.conn.cursor()
         
