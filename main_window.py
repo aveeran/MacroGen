@@ -1,4 +1,9 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QMainWindow, QPushButton, QVBoxLayout, 
+    QHBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QSizePolicy,
+    QSpacerItem
+)
+
 from db_connection import DatabaseConnection
 import json
 
@@ -8,6 +13,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.db_conn = DatabaseConnection.get_instance()
+        self.secondary_windows = []
         
         self.setWindowTitle("MacroGen")
         self.parentLayout = QVBoxLayout()
@@ -15,9 +21,12 @@ class MainWindow(QMainWindow):
 
         self.init_macro_table()
 
-        self.init_action_buttons()
+        button_spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         buttonWidget = QWidget()
+        self.buttonsLayout.addItem(button_spacer)
+        self.init_action_buttons()
         buttonWidget.setLayout(self.buttonsLayout)
+        
         self.parentLayout.addWidget(buttonWidget)
 
         container = QWidget()
@@ -25,7 +34,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
     def closeEvent(self, event):
+        for x in self.secondary_windows:
+            x.close()
         DatabaseConnection.close_connection()
+        event.accept()
 
     def init_macro_table(self):
         query = "SELECT * FROM macros"
@@ -43,6 +55,8 @@ class MainWindow(QMainWindow):
             for col, col_data in enumerate(row_data):
                 item = QTableWidgetItem(col_data)
                 self.tableWidget.setItem(row, col, item)
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.tableWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.parentLayout.addWidget(self.tableWidget)
 
     def init_action_buttons(self):
