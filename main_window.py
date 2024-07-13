@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem
-import sqlite3 
+from db_connection import DatabaseConnection
 import json
 
 # we are going to use sqlite3 and json
@@ -7,6 +7,10 @@ import json
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.conn = DatabaseConnection.get_connection()
+        self.temp_data()
+        
         self.setWindowTitle("MacroGen")
         self.parentLayout = QVBoxLayout()
         self.buttonsLayout = QHBoxLayout()
@@ -14,11 +18,20 @@ class MainWindow(QMainWindow):
         self.init_macro_table()
 
         self.init_action_buttons()
-        self.parentLayout.addWidget(self.buttonsLayout)
+        buttonWidget = QWidget()
+        buttonWidget.setLayout(self.buttonsLayout)
+        self.parentLayout.addWidget(buttonWidget)
 
         container = QWidget()
         container.setLayout(self.parentLayout)
         self.setCentralWidget(container)
+
+    def temp_data(self):
+        query = "INSERT INTO macros (name, date, date_modified, macro) VALUES (?, ?, ?, ?)"
+        params = ('Example Macro', '20204-07-12', '2024-07-12', 'print("Hello, World!")')
+        self.conn.execute_query(query, params)
+
+        
 
     def init_macro_table(self):
         pass
