@@ -51,5 +51,3 @@ class DatabaseConnection:
         except sqlite3.Error as e:
             print(f"Error executing query: {e}")
             return None
-
-    

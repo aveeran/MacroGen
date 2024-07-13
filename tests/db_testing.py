@@ -1,34 +1,17 @@
 import unittest
 import sys 
 import os
-# Append the parent directory of the current script to the sys.path
+
+# adding import path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
 sys.path.append(parent_dir)
 
-from db_connection import DatabaseConnection  # Importing DatabaseConnection from db_connection.py
+from db_connection import DatabaseConnection 
 
-# class TestDatabaseConnection(unittest.TestCase):
-#     def test_singleton_instance(self):
-#         conn1 = DatabaseConnection.get_connection()
-#         conn2 = DatabaseConnection.get_connection()
-        
-#         self.assertIs(conn1, conn2, "Instances should be the same")
-#         DatabaseConnection.close_connection()
-
-#     def test_close_connection(self):
-#         DatabaseConnection.get_connection()
-#         DatabaseConnection.close_connection()
-#         conn = DatabaseConnection.get_connection()
-        
-#         self.assertIsNotNone(conn, "Connection should be reopened after close")
-
-# if __name__ == '__main__':
-#     unittest.main()
 class TestDatabaseConnection(unittest.TestCase):
 
     def setUp(self):
-        # Ensure a fresh start
         DatabaseConnection.close_connection()
         if os.path.exists('macros.db'):
             os.remove('macros.db')
@@ -96,3 +79,4 @@ class TestDatabaseConnection(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    
