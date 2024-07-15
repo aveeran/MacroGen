@@ -4,8 +4,9 @@ from PyQt6.QtWidgets import (
     QSpacerItem
 )
 
+from PyQt6.QtCore import Qt, QEvent
+
 from db_connection import DatabaseConnection
-import json
 
 # we are going to use sqlite3 and json
 
@@ -43,7 +44,7 @@ class MainWindow(QMainWindow):
         query = "SELECT * FROM macros"
         cursor = self.db_conn.execute_query(query)
         rows = cursor.fetchall()
-        
+
         self.tableWidget = QTableWidget()
         self.tableWidget.setRowCount(len(rows))
         self.tableWidget.setColumnCount(5)
@@ -51,27 +52,43 @@ class MainWindow(QMainWindow):
         horizontal_header_labels = ["ID", "NAME", "DATE CREATED", "DATE MODIFIED", "CONTENT"]
         self.tableWidget.setHorizontalHeaderLabels(horizontal_header_labels)
 
+
         for row, row_data in enumerate(rows):
-            for col, col_data in enumerate(row_data):
-                item = QTableWidgetItem(col_data)
+            for col, col_data in enumerate(row_data[0:5]):
+                item = QTableWidgetItem(str(col_data)) # QTableWidgetItem accepts a string
+
+                # right-align macro ID
+                if col == 0:
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+                
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 self.tableWidget.setItem(row, col, item)
+
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tableWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        self.tableWidget.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.tableWidget.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
+
+        self.tableWidget.cellDoubleClicked.connect(self.on_row_double_clicked)
+
         self.parentLayout.addWidget(self.tableWidget)
+    
+    def on_row_double_clicked(self, row, column):
+        pass
 
     def init_action_buttons(self):
         add_macro_btn = QPushButton("Add Macro")
-        delete_macro_btn = QPushButton("Delete Macro")
+        view_macro_btn = QPushButton("View Macro")
         exec_macro_btn = QPushButton("Execute Macro")
 
         add_macro_btn.clicked.connect(self.add_macro_handler)
-        delete_macro_btn.clicked.connect(self.delete_macro_handler)
+        view_macro_btn.clicked.connect(self.delete_macro_handler)
         exec_macro_btn.clicked.connect(self.exec_macro_handler)
 
         self.buttonsLayout.addWidget(add_macro_btn)
-        self.buttonsLayout.addWidget(delete_macro_btn)
+        self.buttonsLayout.addWidget(view_macro_btn)
         self.buttonsLayout.addWidget(exec_macro_btn)
-
 
     def add_macro_handler(self):
         pass

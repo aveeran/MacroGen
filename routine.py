@@ -11,11 +11,11 @@ def on_press(key):
     if key == record_key:
         if not recording:
             recording = True
-            recorded_events.append(('start', mouse.Controller.position))
+            recorded_events.append(('start', mouse.Controller().position))
         else:
              # temporary, to see what is going on
              for x in recorded_events:
-                  print(x, end="\n")
+                print(x, end="\n")
           
     elif key != record_key and recording: 
           recorded_events.append(('key', key))
